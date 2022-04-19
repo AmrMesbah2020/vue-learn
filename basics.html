@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn Vue.js</title>
+</head>
+<body>
+    <div id="app">
+        <h1>{{showMyName() + ' your age is '+ age}}</h1>
+        <p>your first skill is {{skills[0]}}</p>
+        <span>{{isSubscribed ? 'you are subscribed' : 'shit'}}</span>
+        <div>test completed is {{CompletedTests[0].testname}}</div>
+        <div>your age in days {{ageInDays()}}</div>
+        <div>today :{{date}}</div>
+        <button @click="showNewDate">show new date</button>
+
+        <p v-text="title"></p>
+        <p v-html="title"></p>
+
+        <ul>
+            <li v-for="skill in skills">
+                {{skill}}
+            </li>
+        </ul>
+        <ul>
+            <li v-for="(skill,index) in skills">
+               {{index}} => {{skill}}
+            </li>
+        </ul>
+        <ul>
+            <li v-for="test in CompletedTests">
+               {{test.testname}} | {{test.testResult}}
+            </li>
+        </ul>
+        <div>
+            <small>'from if condition '</small>
+            <span v-if="age <18">you are underage</span>
+            <span v-else-if="age >18 && age < 40">you are adult</span>
+            <span v-else>too Old</span>
+        </div>
+        <p v-once="name"><small>from v-once</small>{{name}}</p> <!-- prevent framwork from rendering the element 'do it onle once' -->
+        <p v-show="name"><small>from v-once</small>{{name}}</p> <!-- like if-condition but here the element still on dom with display hidden -->
+        <a :href="imageuRL">
+            <img v-bind:src="imageSrc" :alt="imageAlt"> <!-- v-bind === : -->
+        </a>
+        <p  v-text="counter"></p>
+        <button @click.right="counter++">increment</button><!--use .right on mouse to increment-->
+
+        <form action="">
+            <!-- <input type="text" placeholder="using v-bind" v-bind="age"> -->
+            <input type="text" placeholder="using v-model" v-model="source"> <!-- use with select,check,radio and textarea "ignore value attribute" -->
+            <label>{{source}}</label>
+        </form>
+        
+        <app-count v-for="test in CompletedTests" :age="age" :source="source" :date="date" :testname="test.testname" :testResult="test.testResult"></app-count>
+        <app-article></app-article> <!-- local component -->
+
+        <p v-for="test in CompletedTests">{{reverseMessage1()}}</p> <!-- normal method  -->
+        <p v-for="test in CompletedTests">{{reverseMessage2}}</p> <!-- computed is property in method style just run one time 'no parameters accepted' -->
+        <label>Search for Programming languages : </label>
+        <input type="text" v-model="findLang">
+        <p>{{filterlanguages}}</p>
+
+        <input type="text" v-model="username"> <label style="color: red;">{{validation}}</label><br>
+        <label for="">price</label><input type="text" v-model="eg" placeholder="egypt"><input type="text" v-model="sar" placeholder="ksa">
+        <p>{{eg1+" "+sar1}}</p>
+
+    </div>
+   
+
+</body>
+<script src="js/vue.js"></script>
+<script>
+
+ var Article={
+    data:function(){
+            return {
+                name:"Amr",
+                likes:51651165
+            }
+        },
+        template:"<h1>ARTICLE</h1> "
+    }
+ 
+    Vue.component('app-count',{
+        data:function(){
+            return {
+                name:"elZero",
+                likes:0
+            }
+        },
+        props:['age','source','date','testname','testResult'],
+        template:"<p @click='likes++'>{{likes}} Like {{source}} {{age}} {{date}} test name : {{testname}} and the the result is {{testResult}}</p> "
+    })
+    var vm = new Vue({
+        el : '#app',
+        data:{
+            name:'Amr',
+            age :24,
+            skills:['html','css','js'],
+            isSubscribed:false,
+            date:'today',
+            title:'<b class="rank">noob<b>',
+            imageSrc:'imgs/123.jpg',
+            imageuRL:'http://www.google.com',
+            imageAlt:'abc',
+            counter:0,
+            source:"test",
+            findLang:'',
+            eg:0,
+            sar:0,
+            languages:[
+                'html','css','php','laravel','vue','python','sql'
+            ],
+            username:"",
+            CompletedTests:[
+                {
+                    testname:'first test',
+                    testResult:'70%'
+                },
+                {
+                    testname:'second test',
+                    testResult:'90%'
+                },
+                {
+                    testname:'third test',
+                    testResult:'65%'
+                }
+            ]
+        },
+        methods:{
+            showMyName:function(){
+                return this.name;
+            },
+            showNewDate:function(){
+                this.date=Date();
+            },
+            ageInDays : function(){
+               return this.age*365;
+            },
+            reverseMessage1:function(){
+                console.log('method');
+                return this.name.split('').reverse().join('');
+            }
+        },
+        computed:{
+            reverseMessage2:function(){
+                console.log('computed');
+                return this.name.split('').reverse().join('');
+            },
+            filterlanguages:function(){
+                console.log('reg');
+               let regular = new RegExp(this.findLang,'i');
+              return this.languages.filter(function(item){
+                   return item.match(regular);
+               })
+            },
+            validation:function(){
+                if(!this.username){
+                    return "username can't be empty"
+                }else if(this.username.length < 3){
+                    return "too short username"
+                }else{
+                   return 'welcome '+this.username+' good' 
+                }
+            },
+            eg1:function(v){
+                console.log('eg run com');
+                return this.sar=this.eg/5;
+            },
+            sar1:function(v){
+                console.log('sar run com');
+               return this.eg=this.sar*5; 
+            }
+        },
+        watch:{
+            eg:function(v){
+                console.log('eg run');
+                return this.sar=this.eg/5;
+            },
+            sar:function(v){
+                console.log('sar run');
+               return this.eg=this.sar*5; 
+            }
+        },
+        components:{
+            'app-article':Article
+        },
+
+    })
+</script>
+</html>
